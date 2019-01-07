@@ -14,6 +14,7 @@ blocklist=[]
 for row in table:
     #if search for comma
     requestnumbers = row[0]
+    print requestnumbers
     ip = row[2]
     try:
         ip = ip.split(", ")
@@ -24,12 +25,13 @@ for row in table:
         url = "https://en.wikipedia.org/w/api.php?action=query&format=json&prop=&list=blocks&titles=&bkip="+item
         response = urllib.urlopen(url)
         data = json.loads(response.read())
-        print data["query"]["blocks"][0]["user"]
-        try:ip = data["query"]["blocks"][0]["user"]
+        blockdata=data["query"]["blocks"][0]
+        print blockdata["user"]
+        try:ip = blockdata["user"]
         except:continue
         try:cidr = ip.split("/")
         except:cidr = False
-        reason = data["query"]["blocks"]["reason"]
+        reason = blockdata["reason"]
         print row[0]
         print cidr
         print reason
