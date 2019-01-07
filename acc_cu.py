@@ -30,6 +30,8 @@ for row in table:
             db.commit()
             continue
         reason = blockdata["reason"]
+        try:acc = blockdata["nocreate"]
+        except:continue
         if "ACC ignore" in reason:
             cur.execute("UPDATE production.request SET blockcheck='1' WHERE id="+str(row[0])+";")
             db.commit()
