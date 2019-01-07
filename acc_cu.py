@@ -24,6 +24,7 @@ for row in table:
         url = "https://en.wikipedia.org/w/api.php?action=query&format=json&prop=&list=blocks&titles=&bkip="+item
         response = urllib.urlopen(url)
         data = json.loads(response.read())
+        print data["query"]["blocks"]["user"]
         try:ip = data["query"]["blocks"]["user"]
         except:continue
         try:cidr = ip.split("/")
