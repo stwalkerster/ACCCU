@@ -46,11 +46,9 @@ for row in table:
         try:cidr = ip.split("/")
         except:cidr = False
         print "-------------"
-        timestamp = str(datetime.datetime.now()).split(".")[0]
-        rawts = datetime.datetime.now()
         cur.execute("UPDATE production.request SET blockcheck='1' WHERE id="+str(row[0])+";")
         db.commit()
-        cur.execute("UPDATE production.request SET status='CheckUser' WHERE id="+str(row[0])+";")
+        cur.execute("UPDATE production.request SET status='Checkuser' WHERE id="+str(row[0])+";")
         db.commit()
         cur.execute("INSERT INTO production.comment (time, user, comment, visibility, request) VALUES (\""+time.strftime('%Y-%m-%d %H:%M:%S')+"\", '1733', \"Block detected requiring CU check\", \"user\", "+str(row[0])+");")
         db.commit()
