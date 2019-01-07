@@ -8,7 +8,6 @@ db = MySQLdb.connect(host="localhost",    # your host, usually localhost
 cur = db.cursor()
 cur.execute("SELECT id,status,forwardedip FROM production.request where status != 'Closed' and status != 'Hold' and status != 'CheckUser' and emailconfirm RLIKE 'confirmed' and blockcheck = 0;")
 table = cur.fetchall()
-db.close()
 requestnumbers=list()
 blocklist=list()
 warnlist=list()
@@ -51,4 +50,4 @@ for row in table:
         cur.execute("INSERT INTO production.log (objectid, objecttype, user, action, timestamp) VALUES ("+str(row[0])+", \"Request\", 1733, \"Deferred to users\", \""+timestamp+"\");")
         print "Done - " + row[0]
         time.sleep(60)
-        
+db.close()
