@@ -52,7 +52,7 @@ for row in table:
         db.commit()
         cur.execute("UPDATE production.request SET status='CheckUser' WHERE id="+str(row[0])+";")
         db.commit()
-        cur.execute("INSERT INTO production.comment (time, user, comment, visibility, request) VALUES (\""+rawts+")\", '1733', \"Block detected requiring CU check\", \"user\", "+str(row[0])+");")
+        cur.execute("INSERT INTO production.comment (time, user, comment, visibility, request) VALUES (\""+rawts+"\", '1733', \"Block detected requiring CU check\", \"user\", "+str(row[0])+");")
         db.commit()
         cur.execute("INSERT INTO production.log (objectid, objecttype, user, action, timestamp) VALUES ("+str(row[0])+", \"Request\", 1733, \"Deferred to users\", \""+timestamp+"\");")
         db.commit()
