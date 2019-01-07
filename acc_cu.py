@@ -28,6 +28,7 @@ for row in table:
         try:blockdata=data["query"]["blocks"][0]
         except:continue
         reason = blockdata["reason"]
+        if "ACC ignore" in reason:continue
         ip = blockdata["user"]
         first = True
         warn=False
@@ -36,9 +37,10 @@ for row in table:
                 warn=True
         if warn:
             warnlist.append(row[0])
+            print: "WARN: " + reason
         else:
             blocklist.append(row[0])
-            print reason
+            print "NONE: " + reason
         try:cidr = ip.split("/")
         except:cidr = False
         print "-------------"
