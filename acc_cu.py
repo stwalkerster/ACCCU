@@ -13,7 +13,7 @@ requestnumbers=list()
 blocklist=list()
 for row in table:
     #if search for comma
-    requestnumbers = requestnumbers.append(row[0])
+    requestnumbers.append(row[0])
     print requestnumbers
     ip = row[2]
     try:
