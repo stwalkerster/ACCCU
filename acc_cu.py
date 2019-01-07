@@ -25,9 +25,10 @@ for row in table:
         url = "https://en.wikipedia.org/w/api.php?action=query&format=json&prop=&list=blocks&titles=&bkip="+item
         response = urllib.urlopen(url)
         data = json.loads(response.read())
-        blockdata=data["query"]["blocks"][0]
-        try:ip = blockdata["user"]
+        try:blockdata=data["query"]["blocks"][0]
         except:continue
+        ip = blockdata["user"]
+        #blocknum
         try:cidr = ip.split("/")
         except:cidr = False
         reason = blockdata["reason"]
