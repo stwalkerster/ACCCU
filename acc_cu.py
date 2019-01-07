@@ -33,8 +33,8 @@ for row in table:
             if blockreason in reason:
                 warnlist.append(row[0])
             else:
+                print reason
                 blocklist.append(row[0])
         try:cidr = ip.split("/")
         except:cidr = False
-        print reason
         print "-------------"
