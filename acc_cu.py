@@ -1,6 +1,5 @@
 #!/usr/bin/python
-import MySQLdb, time, json
-from urllib2 import Request, urlopen, URLError, HTTPError
+import MySQLdb, time, urllib, json
 
 db = MySQLdb.connect(host="localhost",    # your host, usually localhost
                      user="dqscript",         # your username
@@ -20,16 +19,8 @@ for row in table:
     for item in ip:
         time.sleep(5)
         req = Request("https://en.wikipedia.org/w/api.php?action=query&format=json&prop=&list=blocks&titles=&bkip="+item)
-        try:
-            response = json.loads(urlopen(req).decode())
-        except HTTPError as e:
-            print 'The server couldn\'t fulfill the request.'
-            print 'Error code: ', e.code
-        except URLError as e:
-            print 'We failed to reach a server.'
-            print 'Reason: ', e.reason
-        else:
-            print response
-            break
+        response = urllib.urlopen(url)
+        data = json.loads(response.read())
+        print data
         break
     break
