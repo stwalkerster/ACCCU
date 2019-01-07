@@ -13,6 +13,5 @@ table = cur.fetchall()
 db.close()
 for row in table:
     #if search for comma
-    for ip in row[2]:
-        print ip
-        exit
+    print row[2]
+    exit
