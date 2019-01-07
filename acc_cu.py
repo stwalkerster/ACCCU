@@ -6,7 +6,7 @@ db = MySQLdb.connect(host="localhost",    # your host, usually localhost
                      passwd="BravoackenDelta",  # your password
                      db="production")        # name of the data base
 cur = db.cursor()
-cur.execute("SELECT id,status,forwardedip FROM production.request where status != 'Closed' and status != 'Hold' and status != 'CheckUser' and emailconfirm RLIKE 'confirmed';")
+cur.execute("SELECT id,status,forwardedip FROM production.request where status != 'Closed' and status != 'Hold' and status != 'CheckUser' and emailconfirm RLIKE 'confirmed' and blockcheck = 0;")
 table = cur.fetchall()
 db.close()
 requestnumbers=list()
@@ -26,21 +26,28 @@ for row in table:
         response = urllib.urlopen(url)
         data = json.loads(response.read())
         try:blockdata=data["query"]["blocks"][0]
-        except:continue
+        except:
+            cur.execute("UPDATE `production`.`request` SET `blockcheck`='1' WHERE `id`='"+row[0]+"';")
+            continue
         reason = blockdata["reason"]
-        if "ACC ignore" in reason:continue
+        if "ACC ignore" in reason:
+            cur.execute("UPDATE `production`.`request` SET `blockcheck`='1' WHERE `id`='"+row[0]+"';")
+            continue
         ip = blockdata["user"]
         first = True
         warn=False
         for blockreason in cautiousblocks:
-            if blockreason in reason:
-                warn=True
-        if warn:
-            warnlist.append(row[0])
-            print "WARN: " + reason
-        else:
-            blocklist.append(row[0])
-            print "NONE: " + reason
+            if blockreason.lower() in reason.lower():
+                cur.execute("UPDATE `production`.`request` SET `blockcheck`='1' WHERE `id`='"+row[0]+"';")
+                continue
+        blocklist.append(row[0])
         try:cidr = ip.split("/")
         except:cidr = False
         print "-------------"
+        cur.execute("UPDATE `production`.`request` SET `blockcheck`='1' WHERE `id`='"+row[0]+"';")
+        cur.execute("UPDATE `production`.`request` SET `status`='CheckUser' WHERE `id`='"+row[0]+"';")
+        cur.execute("INSERT INTO production.comment (time, user, comment, visibility, request) VALUES (\""+timestamp+")\", '1733', \"Block detected requiring CU check\", \"user\", "+row[0]+");")
+        cur.execute("INSERT INTO production.log (objectid, objecttype, user, action, timestamp) VALUES ("+row[0]+", \"Request\", 1733, \"Deferred to users\", \""+timestamp+"\");")
+        print "Done - " + row[0]
+        time.sleep(60)
+        
