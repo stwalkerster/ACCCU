@@ -1,7 +1,6 @@
 #!/usr/bin/python
-import MySQLdb
-import urllib
-import urllib2
+import MySQLdb, time
+from urllib2 import Request, urlopen, URLError, HTTPError
 
 db = MySQLdb.connect(host="localhost",    # your host, usually localhost
                      user="dqscript",         # your username
@@ -13,5 +12,24 @@ table = cur.fetchall()
 db.close()
 for row in table:
     #if search for comma
-    print row[2]
-    exit
+    ip = row[2]
+    try:
+        ip = ip.split(", ")
+    except:
+        a=1 #just continue
+    for item in ip:
+        time.sleep(5)
+        req = Request("https://en.wikipedia.org/w/api.php?action=query&format=json&prop=&list=blocks&titles=&bkip="+ip)
+        try:
+            response = urlopen(req)
+        except HTTPError as e:
+            print 'The server couldn\'t fulfill the request.'
+            print 'Error code: ', e.code
+        except URLError as e:
+            print 'We failed to reach a server.'
+            print 'Reason: ', e.reason
+        else:
+            print response.read()
+            break
+        break
+    break
