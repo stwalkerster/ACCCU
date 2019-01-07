@@ -18,7 +18,7 @@ for row in table:
         a=1 #just continue
     for item in ip:
         time.sleep(5)
-        req = Request("https://en.wikipedia.org/w/api.php?action=query&format=json&prop=&list=blocks&titles=&bkip="+item)
+        url = "https://en.wikipedia.org/w/api.php?action=query&format=json&prop=&list=blocks&titles=&bkip="+item
         response = urllib.urlopen(url)
         data = json.loads(response.read())
         print data
