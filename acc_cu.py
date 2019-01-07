@@ -58,5 +58,6 @@ for row in table:
         cur.execute("INSERT INTO production.log (objectid, objecttype, user, action, timestamp) VALUES ("+str(row[0])+", \"Request\", 1733, \"Deferred to checkusers\", \""+time.strftime('%Y-%m-%d %H:%M:%S')+"\");")
         db.commit()
         print "Done - " + str(row[0])
-        time.sleep(60)
+        cur.execute("UPDATE production.request SET blockcheck = 1 where status=\"Checkuser\";")
+        db.commit()
 db.close()
