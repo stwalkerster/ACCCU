@@ -29,8 +29,7 @@ for row in table:
         try:cidr = ip.split("/")
         except:cidr = False
         reason = data["query"]["blocks"]["reason"]
+        print row[0]
         print cidr
         print reason
-        
-        break
-    break
+        print "-------------"
