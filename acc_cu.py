@@ -21,6 +21,6 @@ for row in table:
         url = "https://en.wikipedia.org/w/api.php?action=query&format=json&prop=&list=blocks&titles=&bkip="+item
         response = urllib.urlopen(url)
         data = json.loads(response.read())
-        print data
+        print data["query"]
         break
     break
