@@ -13,7 +13,7 @@ requestnumbers=[]
 blocklist=[]
 for row in table:
     #if search for comma
-    requestnumbers = row[0]
+    requestnumbers = requestnumbers.append(row[0])
     print requestnumbers
     ip = row[2]
     try:
@@ -26,7 +26,6 @@ for row in table:
         response = urllib.urlopen(url)
         data = json.loads(response.read())
         blockdata=data["query"]["blocks"][0]
-        print blockdata["user"]
         try:ip = blockdata["user"]
         except:continue
         try:cidr = ip.split("/")
