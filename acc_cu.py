@@ -30,6 +30,7 @@ for row in table:
         reason = blockdata["reason"]
         ip = blockdata["user"]
         first = True
+        warn=False
         for blockreason in cautiousblocks:
             if blockreason in reason:
                 warn=True
