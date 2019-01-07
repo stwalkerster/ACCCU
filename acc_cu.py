@@ -27,10 +27,12 @@ for row in table:
         try:blockdata=data["query"]["blocks"][0]
         except:
             cur.execute("UPDATE production.request SET blockcheck='1' WHERE id="+str(row[0])+";")
+            db.commit()
             continue
         reason = blockdata["reason"]
         if "ACC ignore" in reason:
             cur.execute("UPDATE production.request SET blockcheck='1' WHERE id="+str(row[0])+";")
+            db.commit()
             continue
         ip = blockdata["user"]
         first = True
@@ -38,16 +40,22 @@ for row in table:
         for blockreason in cautiousblocks:
             if blockreason.lower() in reason.lower():
                 cur.execute("UPDATE production.request SET blockcheck='1' WHERE id="+str(row[0])+";")
+                db.commit()
                 continue
         blocklist.append(row[0])
         try:cidr = ip.split("/")
         except:cidr = False
         print "-------------"
         timestamp = str(datetime.datetime.now()).split(".")[0]
+        rawts = datetime.datetime.now()
         cur.execute("UPDATE production.request SET blockcheck='1' WHERE id="+str(row[0])+";")
+        db.commit()
         cur.execute("UPDATE production.request SET status='CheckUser' WHERE id="+str(row[0])+";")
-        cur.execute("INSERT INTO production.comment (time, user, comment, visibility, request) VALUES (\""+timestamp+")\", '1733', \"Block detected requiring CU check\", \"user\", "+str(row[0])+");")
+        db.commit()
+        cur.execute("INSERT INTO production.comment (time, user, comment, visibility, request) VALUES (\""+rawts+")\", '1733', \"Block detected requiring CU check\", \"user\", "+str(row[0])+");")
+        db.commit()
         cur.execute("INSERT INTO production.log (objectid, objecttype, user, action, timestamp) VALUES ("+str(row[0])+", \"Request\", 1733, \"Deferred to users\", \""+timestamp+"\");")
+        db.commit()
         print "Done - " + str(row[0])
         time.sleep(60)
 db.close()
