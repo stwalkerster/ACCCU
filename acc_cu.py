@@ -37,7 +37,7 @@ for row in table:
                 warn=True
         if warn:
             warnlist.append(row[0])
-            print: "WARN: " + reason
+            print "WARN: " + reason
         else:
             blocklist.append(row[0])
             print "NONE: " + reason
