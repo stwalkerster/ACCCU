@@ -1,5 +1,5 @@
 #!/usr/bin/python
-import MySQLdb, time
+import MySQLdb, time, json
 from urllib2 import Request, urlopen, URLError, HTTPError
 
 db = MySQLdb.connect(host="localhost",    # your host, usually localhost
@@ -21,7 +21,7 @@ for row in table:
         time.sleep(5)
         req = Request("https://en.wikipedia.org/w/api.php?action=query&format=json&prop=&list=blocks&titles=&bkip="+item)
         try:
-            response = urlopen(req)
+            response = json.loads(urlopen(req).decode())
         except HTTPError as e:
             print 'The server couldn\'t fulfill the request.'
             print 'Error code: ', e.code
@@ -29,7 +29,7 @@ for row in table:
             print 'We failed to reach a server.'
             print 'Reason: ', e.reason
         else:
-            print response.read()
+            print response
             break
         break
     break
