@@ -19,7 +19,7 @@ for row in table:
         a=1 #just continue
     for item in ip:
         time.sleep(5)
-        req = Request("https://en.wikipedia.org/w/api.php?action=query&format=json&prop=&list=blocks&titles=&bkip="+ip)
+        req = Request("https://en.wikipedia.org/w/api.php?action=query&format=json&prop=&list=blocks&titles=&bkip="+item)
         try:
             response = urlopen(req)
         except HTTPError as e:
