@@ -29,12 +29,15 @@ for row in table:
         except:continue
         reason = blockdata["reason"]
         ip = blockdata["user"]
+        first = True
         for blockreason in cautiousblocks:
             if blockreason in reason:
-                warnlist.append(row[0])
-            else:
-                print reason
-                blocklist.append(row[0])
+                warn=True
+        if warn:
+            warnlist.append(row[0])
+        else:
+            blocklist.append(row[0])
+            print reason
         try:cidr = ip.split("/")
         except:cidr = False
         print "-------------"
