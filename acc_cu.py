@@ -6,7 +6,7 @@ db = MySQLdb.connect(host="localhost",    # your host, usually localhost
                      passwd="BravoackenDelta",  # your password
                      db="production")        # name of the data base
 cur = db.cursor()
-cur.execute("SELECT id,status,forwardedip FROM production.request where status != 'Closed' and status != 'Hold' and status != 'CheckUser' and emailconfirm RLIKE 'confirmed' and blockcheck = 0;")
+cur.execute("SELECT id,status,forwardedip FROM production.request where status != 'Closed' and status != 'Hold' and status != 'Checkuser' and emailconfirm RLIKE 'confirmed' and blockcheck = 0;")
 table = cur.fetchall()
 requestnumbers=list()
 blocklist=list()
@@ -39,9 +39,11 @@ for row in table:
         warn=False
         for blockreason in cautiousblocks:
             if blockreason.lower() in reason.lower():
+                warn = True
                 cur.execute("UPDATE production.request SET blockcheck='1' WHERE id="+str(row[0])+";")
                 db.commit()
                 continue
+        if warn:continue
         blocklist.append(row[0])
         try:cidr = ip.split("/")
         except:cidr = False
