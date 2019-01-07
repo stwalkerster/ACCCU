@@ -1,6 +1,6 @@
 #!/usr/bin/python
 import MySQLdb, time, urllib, json
-
+cautiousblocks = ["{{anonblock}}","{{schoolblock}}","vandalism", "school"]
 db = MySQLdb.connect(host="localhost",    # your host, usually localhost
                      user="dqscript",         # your username
                      passwd="BravoackenDelta",  # your password
@@ -11,10 +11,10 @@ table = cur.fetchall()
 db.close()
 requestnumbers=list()
 blocklist=list()
+warnlist=list()
 for row in table:
     #if search for comma
     requestnumbers.append(row[0])
-    print requestnumbers
     ip = row[2]
     try:
         ip = ip.split(", ")
@@ -27,12 +27,14 @@ for row in table:
         data = json.loads(response.read())
         try:blockdata=data["query"]["blocks"][0]
         except:continue
+        reason = blockdata["reason"]
         ip = blockdata["user"]
-        #blocknum
+        for blockreason in cautiousblocks:
+            if blockreason in reason:
+                warnlist.append(row[0])
+            else:
+                blocklist.append(row[0])
         try:cidr = ip.split("/")
         except:cidr = False
-        reason = blockdata["reason"]
-        print row[0]
-        print cidr
         print reason
         print "-------------"
