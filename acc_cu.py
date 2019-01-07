@@ -9,8 +9,8 @@ cur = db.cursor()
 cur.execute("SELECT id,status,forwardedip FROM production.request where status != 'Closed' and status != 'Hold' and status != 'CheckUser' and emailconfirm RLIKE 'confirmed';")
 table = cur.fetchall()
 db.close()
-requestnumbers=[]
-blocklist=[]
+requestnumbers=list()
+blocklist=list()
 for row in table:
     #if search for comma
     requestnumbers = requestnumbers.append(row[0])
