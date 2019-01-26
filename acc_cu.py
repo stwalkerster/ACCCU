@@ -7,7 +7,9 @@ db = MySQLdb.connect(host="localhost",    # your host, usually localhost
                      passwd="BravoackenDelta",  # your password
                      db="production")        # name of the data base
 cur = db.cursor()
-cur.execute("SELECT id,status,forwardedip FROM production.request where status != 'Closed' and status != 'Hold' and status != 'Checkuser' and emailconfirm RLIKE 'confirmed' and blockcheck = 0;")
+cur.execute("CREATE SCHEMA IF NOT EXISTS dqscript;")
+cur.execute("CREATE TABLE IF NOT EXISTS dqscript.blockcheck (id INT(11)) ENGINE=InnoDB;")
+cur.execute("SELECT r.id,r.status,r.forwardedip FROM production.request r where r.status != 'Closed' and r.status != 'Hold' and r.status != 'Checkuser' and r.emailconfirm RLIKE 'confirmed' and not exists (SELECT 1 FROM dqscript.blockcheck bc WHERE bc.id = r.id);")
 table = cur.fetchall()
 requestnumbers=list()
 blocklist=list()
@@ -27,17 +29,17 @@ for row in table:
         data = json.loads(response.read())
         try:blockdata=data["query"]["blocks"][0]
         except:
-            cur.execute("UPDATE production.request SET blockcheck='1' WHERE id="+str(row[0])+";")
+            cur.execute("INSERT INTO dqscript.blockcheck SELECT "+str(row[0])+" FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM dqscript.blockcheck WHERE id = "+str(row[0])+");")
             db.commit()
             continue
         reason = blockdata["reason"]
         try:acc = blockdata["nocreate"]
         except:
-            cur.execute("UPDATE production.request SET blockcheck='1' WHERE id="+str(row[0])+";")
+            cur.execute("INSERT INTO dqscript.blockcheck SELECT "+str(row[0])+" FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM dqscript.blockcheck WHERE id = "+str(row[0])+");")
             db.commit()
             continue
         if "ACC ignore" in reason:
-            cur.execute("UPDATE production.request SET blockcheck='1' WHERE id="+str(row[0])+";")
+            cur.execute("INSERT INTO dqscript.blockcheck SELECT "+str(row[0])+" FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM dqscript.blockcheck WHERE id = "+str(row[0])+");")
             db.commit()
             continue
         ip = blockdata["user"]
@@ -46,13 +48,13 @@ for row in table:
         for blockreason in cautiousblocks:
             if blockreason.lower() in reason.lower():
                 warn = True
-                cur.execute("UPDATE production.request SET blockcheck='1' WHERE id="+str(row[0])+";")
+                cur.execute("INSERT INTO dqscript.blockcheck SELECT "+str(row[0])+" FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM dqscript.blockcheck WHERE id = "+str(row[0])+");")
                 db.commit()
                 continue
         for blockreason in proxyblocks:
             if blockreason.lower() in reason.lower():
                 warn = True
-                cur.execute("UPDATE production.request SET blockcheck='1' WHERE id="+str(row[0])+";")
+                cur.execute("INSERT INTO dqscript.blockcheck SELECT "+str(row[0])+" FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM dqscript.blockcheck WHERE id = "+str(row[0])+");")
                 db.commit()
                 cur.execute("UPDATE production.request SET status='Proxy' WHERE id="+str(row[0])+";")
                 db.commit()
@@ -65,7 +67,7 @@ for row in table:
         blocklist.append(row[0])
         try:cidr = ip.split("/")
         except:cidr = False
-        cur.execute("UPDATE production.request SET blockcheck='1' WHERE id="+str(row[0])+";")
+        cur.execute("INSERT INTO dqscript.blockcheck SELECT "+str(row[0])+" FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM dqscript.blockcheck WHERE id = "+str(row[0])+");")
         db.commit()
         cur.execute("UPDATE production.request SET status='Checkuser' WHERE id="+str(row[0])+";")
         db.commit()
@@ -74,6 +76,6 @@ for row in table:
         time.sleep(1)
         cur.execute("INSERT INTO production.log (objectid, objecttype, user, action, timestamp) VALUES ("+str(row[0])+", \"Request\", 1733, \"Deferred to checkusers\", \""+time.strftime('%Y-%m-%d %H:%M:%S')+"\");")
         db.commit()
-        cur.execute("UPDATE production.request SET blockcheck = 1 where status=\"Checkuser\";")
+        cur.execute("INSERT INTO dqscript.blockcheck SELECT "+str(row[0])+" FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM dqscript.blockcheck WHERE id = "+str(row[0])+");")
         db.commit()
 db.close()
