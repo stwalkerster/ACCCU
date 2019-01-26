@@ -1,6 +1,7 @@
 #!/usr/bin/python
 import MySQLdb, time, urllib, json, datetime
 cautiousblocks = ["{{anonblock}}","{{schoolblock}}","vandalism", "school"]
+proxyblocks = ["{{blockedproxy}}","{{webhostblock}}","{{colocationwebhost}}"]
 db = MySQLdb.connect(host="localhost",    # your host, usually localhost
                      user="dqscript",         # your username
                      passwd="BravoackenDelta",  # your password
@@ -46,6 +47,18 @@ for row in table:
             if blockreason.lower() in reason.lower():
                 warn = True
                 cur.execute("UPDATE production.request SET blockcheck='1' WHERE id="+str(row[0])+";")
+                db.commit()
+                continue
+        for blockreason in proxyblocks:
+            if blockreason.lower() in reason.lower():
+                warn = True
+                cur.execute("UPDATE production.request SET blockcheck='1' WHERE id="+str(row[0])+";")
+                db.commit()
+                cur.execute("UPDATE production.request SET status='Proxy' WHERE id="+str(row[0])+";")
+                db.commit()
+                cur.execute("INSERT INTO production.comment (time, user, comment, visibility, request) VALUES (\""+time.strftime('%Y-%m-%d %H:%M:%S')+"\", '1733', \"Block detected requiring proxy check\", \"user\", "+str(row[0])+");")
+                db.commit()
+                cur.execute("INSERT INTO production.log (objectid, objecttype, user, action, timestamp) VALUES ("+str(row[0])+", \"Request\", 1733, \"Deferred to proxy check\", \""+time.strftime('%Y-%m-%d %H:%M:%S')+"\");")
                 db.commit()
                 continue
         if warn:continue
